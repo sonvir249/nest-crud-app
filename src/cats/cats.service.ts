@@ -9,11 +9,7 @@ export class CatsService {
     this.cats.push(cat);
   }
 
-  findAll(): Cat[] {
-    return this.cats;
-  }
-
-  findOne(id: number): Cat {
-    return this.cats[0];
+  findAll(): Promise<Cat[]> {
+    return Promise.resolve(this.cats);
   }
 }

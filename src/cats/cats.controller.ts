@@ -16,15 +16,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
-import { UpdateCatDto } from './dto/update-cat.dto';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
-import { HttpExceptionFilter } from './http-exception.filter';
-import { ZodValidationPipe } from './zod-validation.pipe';
+import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { createCatSchema } from './cat-schema';
-import { RolesGuard } from './roles.guard';
-import { Roles } from './roles.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
 import { LoggingInterceptor } from './logging.intercepter';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('cats')
 @UseGuards(RolesGuard)
@@ -32,8 +31,12 @@ import { LoggingInterceptor } from './logging.intercepter';
 @UseInterceptors(LoggingInterceptor)
 export class CatsController {
   constructor(private catsService: CatsService) {}
+
   @Get()
-  async findAll(@Query('age') age: number, @Query('breed') breed: string) {
+  async findAll(
+    @Query('age') age: number,
+    @Query('breed') breed: string,
+  ): Promise<Cat[]> {
     try {
       return this.catsService.findAll();
     } catch (error) {
@@ -50,17 +53,6 @@ export class CatsController {
     }
   }
 
-  @Get(':id')
-  async findOne(
-    @Param(
-      'id',
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
-    id: number,
-  ) {
-    return this.catsService.findOne(id);
-  }
-
   @Post()
   @Roles(['admin'])
   @UsePipes(new ZodValidationPipe(createCatSchema))
@@ -69,7 +61,7 @@ export class CatsController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
+  update(@Param('id') id: string) {
     return `This action updates a #${id} cat`;
   }
 
