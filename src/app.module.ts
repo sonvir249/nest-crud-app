@@ -18,9 +18,6 @@ import { LoggerMiddlerware } from './cats/middleware/logger.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddlerware).forRoutes({
-      path: 'cats',
-      method: RequestMethod.GET,
-    });
+    consumer.apply(LoggerMiddlerware).forRoutes(CatsController);
   }
 }
